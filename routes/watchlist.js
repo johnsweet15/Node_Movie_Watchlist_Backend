@@ -1,67 +1,50 @@
 const express = require('express')
 const router = express.Router()
 const Watchlist = require('../models/Watchlist')
+const User = require('../models/User')
 const verify = require('./verifyToken')
 
-// gets all watchlists
-router.get('/', verify, async (req, res) => {
+// Get watchlist
+router.get('/:userId', verify, async (req, res) => {
   try {
-    const watchlists = await Watchlist.find()
-    res.json(watchlists)
+    const user = await User.findOne({
+      _id: req.params.userId
+    })
+    res.json(user.watchlist)
   } catch (error) {
     res.json({ message: error })
   }
 })
 
-// submit watchlist
-router.post('/', async (req, res) => {
-  const watchlist = new Watchlist({
-    title: req.body.title,
-    description: req.body.description
-  })
-
+// Add movie to watchlist
+router.patch('/:userId', verify, async (req, res) => {
   try {
-    const savedWatchlist = await watchlist.save();
-    res.status(200).json(savedWatchlist)
-  } catch (error) {
-    res.json({ message: error })
-  }
-
-})
-
-// get specific watchlist
-router.get('/:watchlistId', async (req, res) => {
-  try {
-    const watchlist = await Watchlist.findById(req.params.watchlistId)
-    res.json(watchlist)
-  } catch (error) {
-    res.json({ message: error })
-  }
-})
-
-// delete specific watchlist
-router.delete('/:watchlistId', async (req, res) => {
-  try {
-    const removedWatchlist = await Watchlist.remove({ _id: req.params.watchlistId })
-    res.json(removedWatchlist)
-  } catch (error) {
-    res.json({ message: error })
-  }
-})
-
-// update a watchlist
-router.patch('/:watchlistId', async (req, res) => {
-  try {
-    const updatedWatchlist = await Watchlist.updateOne({
-      _id: req.params.watchlistId
+    const updatedWatchlist = await User.updateOne({
+      _id: req.params.userId
     },
       {
-        $set: { title: req.body.title }
+        $push: { watchlist: req.body }
       })
     res.json(updatedWatchlist)
   } catch (error) {
     res.json({ message: error })
   }
 })
+
+// Delete movie from watchlist
+router.delete('/:userId', verify, async (req, res) => {
+  try {
+    const updatedWatchlist = await User.updateOne({
+      _id: req.params.userId
+    },
+      {
+        $pull: { watchlist: req.body.id }
+      })
+    res.json(updatedWatchlist)
+  } catch (error) {
+    res.json({ message: error })
+  }
+})
+
 
 module.exports = router

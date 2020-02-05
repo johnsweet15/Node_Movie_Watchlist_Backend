@@ -1,18 +1,14 @@
 const mongoose = require('mongoose')
 
 const WatchlistSchema = mongoose.Schema({
-  title: {
-    type: String,
-    required: true
+  movies: {
+    type: Array,
+    default: []
   },
-  description: {
-    type: String,
-    required: true
-  },
-  date: {
-    type: Date,
-    default: Date.now
+  tvShows: {
+    type: Array,
+    default: []
   }
 })
 
-module.exports = mongoose.model('Posts', WatchlistSchema)
+module.exports = mongoose.model('Watchlist', WatchlistSchema)
