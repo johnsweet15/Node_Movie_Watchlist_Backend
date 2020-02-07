@@ -38,7 +38,7 @@ router.delete('/:userId', verify, async (req, res) => {
       _id: req.params.userId
     },
       {
-        $pull: { watchlist: req.body.id }
+        $pull: { watchlist: req.body }
       })
     res.json(updatedWatchlist)
   } catch (error) {
